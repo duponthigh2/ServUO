@@ -1,6 +1,6 @@
+
 using System;
 using Server.Items;
-using Server.Regions;
 
 namespace Server.Engines.Quests
 {
@@ -51,17 +51,16 @@ namespace Server.Engines.Quests
     {
         public override Type[] Quests { get { return new Type[] { typeof(FreedomQuest) }; } }
 
-        public LenleyRegion _Region { get; set; }
+        private static bool Talked { get; set; }
 
         [Constructable]
         public Lenley()
             : base()
         {
             Name = "Lenley";
-            Title = "the Snitch";
+            Title = "the snitch";
             Body = 0x2A;
             Hidden = true;
-            CantWalk = true;
 
             SetStr(96, 120);
             SetDex(81, 100);
@@ -94,57 +93,37 @@ namespace Server.Engines.Quests
             : base(serial)
         {
         }
-
-        public override void RevealingAction()
+        
+        public override void OnMovement(Mobile m, Point3D oldLocation)
         {
-            if (_Region != null)
-                _Region.Unregister();
-
-            CantWalk = false;
-
-            base.RevealingAction();
-        }
-
-        public override void OnDelete()
-        {
-            DeleteLenleyRegion();
-
-            base.OnDelete();
-        }
-
-        public void DeleteLenleyRegion()
-        {
-            if (_Region != null)
-                _Region.Unregister();
-        }
-
-        protected override void OnLocationChange(Point3D oldLocation)
-        {
-            if (Deleted)
-                return;
-
-            UpdateLenleyRegion();
-        }
-
-        protected override void OnMapChange(Map oldMap)
-        {
-            if (Deleted)
-                return;
-
-            UpdateLenleyRegion();
-        }
-
-        public void UpdateLenleyRegion()
-        {
-            if (Hidden)
+            if (!Talked)
             {
-                DeleteLenleyRegion();
-
-                if (!Deleted && Map != Map.Internal)
+                if (m.InRange(this, 2))
                 {
-                    _Region = new LenleyRegion(this);
-                    _Region.Register();
+                    Talked = true;
+                    Say(1075014); // Psst!  Lenley isn't seen.  You help Lenley?
+                    Move(GetDirectionTo(m.Location));
+                    Hidden = false;
+                    SpamTimer t = new SpamTimer();
+                    t.Start();
                 }
+                else
+                    Hidden = true;
+                UseSkill(SkillName.Stealth);
+            }
+        }
+
+        private class SpamTimer : Timer
+        {
+            public SpamTimer()
+                : base(TimeSpan.FromSeconds(30))
+            {
+                Priority = TimerPriority.OneSecond;
+            }
+
+            protected override void OnTick()
+            {
+                Talked = false;
             }
         }
 
@@ -158,24 +137,6 @@ namespace Server.Engines.Quests
         {
             base.Deserialize(reader);
             int version = reader.ReadInt();
-
-            if (Hidden)
-            {
-                Timer.DelayCall(TimeSpan.Zero, new TimerCallback(UpdateLenleyRegion));
-            }
-        }
-    }
-
-    public class LenleyRegion : BaseRegion
-    {
-        public LenleyRegion(Mobile lenley)
-            : base(null, lenley.Map, Region.Find(lenley.Location, lenley.Map), new Rectangle2D(lenley.Location.X - 2, lenley.Location.Y - 2, 5, 5))
-        {
-        }
-
-        public override void OnEnter(Mobile m)
-        {
-            m.SendLocalizedMessage(1075014); // Psst!  Lenley isn't seen.  You help Lenley?
         }
     }
 }

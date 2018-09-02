@@ -5644,8 +5644,11 @@ namespace Server.Mobiles
 
         public string OverheadTitle
         {
+
             get { return m_OverheadTitle; }
+
             set { m_OverheadTitle = value; InvalidateProperties(); }
+
         }
 
         public int CurrentVeteranTitle

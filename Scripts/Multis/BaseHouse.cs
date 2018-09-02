@@ -471,23 +471,21 @@ namespace Server.Multis
 
         private Type[] _NoItemCountTable = new Type[]
         {
-<<<<<<< HEAD
+
             typeof(Server.Engines.Plants.SeedBox),  typeof(GardenShedAddon),
             typeof(GardenShedBarrel),               typeof(BaseSpecialScrollBook),    
+
         };
+
+
 
         private Type[] _NoDecayItems = new Type[]
         {
             typeof(BaseBoard),                      typeof(Aquarium),
             typeof(FishBowl),                       typeof(BaseSpecialScrollBook),
+
             typeof(Server.Engines.Plants.SeedBox)
-=======
-            typeof(Engines.Plants.SeedBox),       typeof(GardenShedAddon),
-            typeof(GardenShedBarrel)
-<<<<<<< HEAD
->>>>>>> Added Trainer Deeds
-=======
->>>>>>> Added Trainer Deeds
+
         };
 
         // Not Included Storage
